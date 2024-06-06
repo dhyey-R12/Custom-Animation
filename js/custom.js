@@ -6,26 +6,14 @@ const handleScroll = () => {
     const zOffset = scrollPos * 0.5;
     slider.style.transform = `${initialTransform} translateY(${zOffset}px)`;
 }
-
-const handleMouseOver = (e) => {
-    e.currentTarget.style.left = "15%";
-}
-
-const handleMouseOut = (e) => {
-    e.currentTarget.style.left = "0%";
-}
-
-
-
 window.addEventListener("scroll", handleScroll);
-// return () => window.removeEventListener("scroll", handleScroll);
+let element = document.getElementsByClassName("card");
+for (let i = 0; i < element.length; i++) {
+    element[i].addEventListener("mouseover",  function () {
+        this.style.left = "15%";
+    });
 
-
-// element = document.querySelector(".card");
-// console.log("element", element);
-// element.addEventListener("mouseover",function(){
-//     this.style.left = "15%";
-// });
-// element.addEventListener("mouseout",function(){
-//     this.style.left = "0%";
-// });
+    element[i].addEventListener("mouseout",function() {
+        this.style.left = "0%";
+    });
+}
