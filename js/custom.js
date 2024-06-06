@@ -1,3 +1,7 @@
+let sliderWidth = document.querySelector(".slider");
+document.body.style.height = `${sliderWidth.scrollHeight}px`;
+console.log("body", document.body.style.height);
+console.log("sliderWidth",sliderWidth.scrollHeight);
 
 const handleScroll = () => {
     const scrollPos = window.scrollY;
