@@ -39,10 +39,9 @@ body {
 } */
 
 .slider_section .slider {
-    /* display: flex; */
-    position: absolute;
-    top: 257%;
-    left: -162%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
     transform: translate3d(-50%, -50%, 0) rotateX(0deg) rotateY(-25deg) rotateZ(-120deg);
     transform-style: preserve-3d;
     transform-origin: center;
@@ -57,6 +56,7 @@ body {
     transform: rotateX(20deg) rotateY(-10deg) rotateZ(130deg);
     border: 2px solid rgba(255, 255, 255, 0.25);
     margin: -300px 0;
+    transition: 1s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .slider_section .slider .card img {
