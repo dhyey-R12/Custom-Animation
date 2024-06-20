@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Animation</title>
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        .slider_items_section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slider_item {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 1px solid #ccc;
+            /* perspective: 100px; */
+        }
+
+        .item {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            background-color: blue;
+            /* transition: all 0.6s ease;  */
+        }
+
+        .item[data-key="0"] {
+            background-color: pink;
+        }
+
+        .item[data-key="1"] {
+            background-color: rgba(100, 255, 100, 1);
+        }
+
+        .item[data-key="2"] {
+            background-color: rgba(100, 100, 255, 1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="slider_items_section">
+        <div class="slider_item">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+        </div>
+    </section>
+
+
+    <script src="js/gsap.min.js"></script>
+    <script src="js/ScrollTrigger.min.js"></script>
+    <!-- <script src="js/custom.js"></script> -->
+
+    <script>
+        // ⚙️ Setup ---------------------- //
+
+        console.clear(); // Start with a clean console on refesh
+        // ⚙️ Setup ---------------------- //
+
+        const items = document.querySelectorAll(".item");
+        const color = gsap.utils.interpolate(["orange", "purple"]);
+        const map = gsap.utils.mapRange(0, items.length, 0, 1);
+        const offset = 30;
+
+        gsap.set(items, {
+            backgroundColor: (index) => color(map(index)),
+            x: (index) => offset * index,
+            y: (index) => -offset * index,
+            zIndex: (index) => items.length - index
+        });
+        // END ⚙️ Setup ------------------ //
+
+        function diagonalLoop(items) {
+            let totalItems = items.length;
+            let currentItem = 0;
+
+            function updatePositions() {
+                for (let i = 0; i < totalItems; i++) {
+                    let itemIndex = (currentItem + i) % totalItems;
+                    let item = items[itemIndex];
+                    gsap.to(item, {
+                        x: offset * i,
+                        y: -offset * i,
+                        transformOrigin: "left bottom",
+
+                        zIndex: totalItems - i,
+                        scale: 1,
+                        opacity: 1
+                    });
+                }
+            }
+
+            function moveToNext() {
+                const movingItem = items[currentItem];
+
+                gsap.to(movingItem, {
+                    scale: 0,
+                    transformOrigin: "left bottom",
+                    opacity: 0,
+                    // y: "+=30",
+                    // x: "-=30",
+                    y: 30,
+                    x: -30,
+                    overwrite: true,
+                    duration: 0.2,
+                    onComplete: () => {
+                        // currentItem = (currentItem + 1) % totalItems;
+                        updatePositions(movingItem);
+                    }
+                });
+                // currentItem = (currentItem + 1) % totalItems;
+                // updatePositions();
+            }
+
+            // setInterval(moveToNext, 2000); // Jeder 2 Sekunden
+            window.addEventListener("scroll", () => {
+                moveToNext();
+            });
+            updatePositions();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            diagonalLoop(items);
+        });
+
+    </script>
+</body>
+
+</html>
