@@ -1,21 +1,40 @@
-document.addEventListener("DOMContentLoaded", (event) => {
-    // gsap.registerPlugin(ScrollTrigger)
-    // gsap code here!
-    console.log("test");
+const BASE_URL = "https://jsonplaceholder.typicode.com/photos"
 
-    createSlide(80);
+document.addEventListener("DOMContentLoaded", async (event) => {
 
-    let sliderWidth = document.getElementById('slider');
-    document.body.style.height = `${sliderWidth.scrollHeight}px`;
+    try {
+        const imageList = await getImages();
+        createSlide(imageList);
+        console.log("imageList : ", imageList);
+        let sliderWidth = document.getElementById('slider');
+        document.body.style.height = `${sliderWidth.scrollHeight}px`;
+    } catch (error) {
+        console.error("Error while getting image from API : ", error);
+    }
+    
 });
 
-function createSlide(sliderNumber) {
+function getImages() {
+    return new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("GET", BASE_URL, true);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                resolve(JSON.parse(this.responseText));
+            }
+        }
+        xhr.send();
+    })
+}
+
+function createSlide(imageList) {
     const slider = document.getElementById('slider');
 
-    for (let i = 0; i < sliderNumber; i++) {
+    for (let i = 0; i < imageList.length; i++) {
         const newSlide = document.createElement('div');
         const newSlideImage = document.createElement('img');
-        newSlideImage.setAttribute("src", `images/image_${randomIntFromInterval(1, 4)}.jpg`);
+        newSlideImage.setAttribute("src", `${imageList[i].url}`);
         newSlide.setAttribute("class", "card");
         newSlide.appendChild(newSlideImage);
         newSlide.addEventListener("mouseover", function () {
@@ -31,6 +50,25 @@ function createSlide(sliderNumber) {
 
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function gsapScroll() {
+    let horizontalSection = document.querySelector('.slider');
+
+    console.log(horizontalSection.scrollWidth);
+
+    gsap.to('.slider', {
+        x: () => horizontalSection.scrollWidth * -1,
+        xPercent: 100,
+        scrollTrigger: {
+            trigger: '.slider',
+            start: 'center center',
+            end: '+=2000px',
+            pin: '.slider_section',
+            scrub: true,
+            invalidateOnRefresh: true
+        }
+    });
 }
 
 
