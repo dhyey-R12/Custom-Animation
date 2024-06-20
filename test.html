@@ -148,7 +148,7 @@
                     overwrite: true,
                     duration: 0.2,
                     onComplete: () => {
-                        // currentItem = (currentItem + 1) % totalItems;
+                        currentItem = (currentItem + 1) % totalItems;
                         updatePositions(movingItem);
                     }
                 });
