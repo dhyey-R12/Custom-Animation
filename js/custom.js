@@ -44,30 +44,6 @@ function createSlide(imageList) {
         });
         slider.appendChild(newSlide);
     }
-
-}
-
-function randomIntFromInterval(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function gsapScroll() {
-    let horizontalSection = document.querySelector('.slider');
-
-    console.log(horizontalSection.scrollWidth);
-
-    gsap.to('.slider', {
-        x: () => horizontalSection.scrollWidth * -1,
-        xPercent: 100,
-        scrollTrigger: {
-            trigger: '.slider',
-            start: 'center center',
-            end: '+=2000px',
-            pin: '.slider_section',
-            scrub: true,
-            invalidateOnRefresh: true
-        }
-    });
 }
 
 
@@ -83,7 +59,7 @@ window.addEventListener("scroll", handleScroll);
 
 
 
-
+// loader JS
 gsap.to(".content-loader-text h1", {
     opacity: 1,
     delay: 0.5,
@@ -105,6 +81,7 @@ let width = 0;
 let bar = document.getElementById("bar");
 let id;
 let isLoadingFinished = false;
+
 function isLoading(showLoading) {
     if (showLoading) {
         id = setInterval(frame, 100);
