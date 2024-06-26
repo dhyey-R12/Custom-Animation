@@ -1,17 +1,16 @@
 const BASE_URL = "https://jsonplaceholder.typicode.com/photos"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-
     try {
+        isLoading(true);
         const imageList = await getImages();
+        isLoading(false);
         createSlide(imageList);
-        console.log("imageList : ", imageList);
         let sliderWidth = document.getElementById('slider');
         document.body.style.height = `${sliderWidth.scrollHeight}px`;
     } catch (error) {
         console.error("Error while getting image from API : ", error);
     }
-    
 });
 
 function getImages() {
@@ -31,7 +30,7 @@ function getImages() {
 function createSlide(imageList) {
     const slider = document.getElementById('slider');
 
-    for (let i = 0; i < imageList.length; i++) {
+    for (let i = 0; i < (imageList.length / 20); i++) {
         const newSlide = document.createElement('div');
         const newSlideImage = document.createElement('img');
         newSlideImage.setAttribute("src", `${imageList[i].url}`);
@@ -81,3 +80,79 @@ const handleScroll = () => {
 }
 
 window.addEventListener("scroll", handleScroll);
+
+
+
+
+gsap.to(".content-loader-text h1", {
+    opacity: 1,
+    delay: 0.5,
+    y: 0,
+    duration: 1.25,
+    stagger: { each: 0.05, from: "random" },
+    ease: "expo.out"
+});
+const tll = gsap.timeline({
+    paused: true
+});
+tll.to("#percent, #bar", {
+    duration: 0.9,
+    opacity: 0,
+    zIndex: -1
+});
+
+let width = 0;
+let bar = document.getElementById("bar");
+let id;
+let isLoadingFinished = false;
+function isLoading(showLoading) {
+    if (showLoading) {
+        id = setInterval(frame, 100);
+    } else {
+        console.log("Here loading need to stop");
+        isLoadingFinished = true;
+        clearInterval(id);
+        id = setInterval(frame, 1);
+    }
+}
+function frame() {
+    if (width >= 100) {
+        console.log("frame called");
+        clearInterval(id);
+        tll.play();
+        gsap.to(".content-loader-text h1", {
+            opacity: 0,
+            delay: 0.4,
+            duration: 1.25,
+            stagger: { each: 0.05, from: "random" },
+            ease: "expo.out"
+        });
+        gsap.to(".loader", {
+            opacity: 0,
+            delay: 1.0,
+            duration: 1.25,
+            ease: "power1.inOut"
+        });
+        gsap.to(".container-loader", {
+            delay: 2.25,
+            duration: 0.3,
+            display: "none",
+            ease: "power1.inOut"
+        });
+    } else {
+        width++;
+        if (width >= 90 && !isLoadingFinished) {
+            console.log("Here we need to pause loader");
+            tll.pause();
+            clearInterval(id);
+            document.getElementById("percent").innerHTML = "It will take a longer time..!!";
+        } else {
+            gsap.to(bar, {
+                width: width + "%",
+                duration: 2.5,
+                ease: "expo.out"
+            });
+            document.getElementById("percent").innerHTML = "( " + width + "%" + " )";
+        }
+    }
+}
