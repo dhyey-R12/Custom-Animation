@@ -1,3 +1,5 @@
+gsap.registerPlugin(ScrollTrigger);
+
 const BASE_URL = "https://jsonplaceholder.typicode.com/photos"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
@@ -6,8 +8,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const imageList = await getImages();
         isLoading(false);
         createSlide(imageList);
+        scrollCard();
+        // setTimeout(function(){
+        //     console.log("start");
+        // }, 3000);
         // let sliderWidth = document.getElementById('slider');
         // document.body.style.height = `${sliderWidth.scrollHeight}px`;
+
     } catch (error) {
         isLoading(false);
         if (error && error.message) {
@@ -43,21 +50,25 @@ function createSlide(imageList) {
 
     for (let i = 0; i < 11; i++) {
         const newSlide = document.createElement('div');
+        const newSlideInner = document.createElement('div');
         const newSlideImage = document.createElement('img');
         newSlideImage.setAttribute("src", `${imageList[i].url}`);
         newSlide.setAttribute("class", "card");
-        newSlide.appendChild(newSlideImage);
-        newSlide.addEventListener("mouseover", function () {
-            this.style.left = "15%";
-        });
-        newSlide.addEventListener("mouseout", function () {
-            this.style.left = "0%";
-        });
+        newSlideInner.setAttribute("class", "card_inner");
+        newSlide.appendChild(newSlideInner);
+        newSlideInner.appendChild(newSlideImage);
+
+        // newSlide.addEventListener("mouseover", function () {
+        //     this.style.left = "15%";
+        // });
+        // newSlide.addEventListener("mouseout", function () {
+        //     this.style.left = "0%";
+        // });
         slider.appendChild(newSlide);
     }
 
     // horizontalScroll();
-    checkWidth();
+    // checkWidth();
 }
 
 
@@ -150,85 +161,52 @@ function frame() {
 }
 
 
-// horizontal scroll JS
-gsap.registerPlugin(ScrollTrigger);
 
-// let horizontalSection = document.querySelector('.slider_section .slider');
-
-// console.log(horizontalSection.scrollWidth);
-
-// gsap.to(horizontalSection, {
-//   x: () => horizontalSection.scrollWidth * -1,
-//   xPercent: 100,
-//   scrollTrigger: {
-//     trigger: horizontalSection,
-//     start: 'top top',
-//     end: 'bottom bottom',
-//     pin: '.slider_section ',
-//     scrub: true,
-//     invalidateOnRefresh: true
-//   }
-// });
+function scrollCard() {
+    const pinnedSections = gsap.utils.toArray(".card");
+    // const lastCard = document.querySelector(".card.scroll");
+    const lastCard = pinnedSections.pop();
+    const footer = document.querySelector(".footer");
+    // const footer = lastCard.nextElementSibling;
+    // console.log("card", pinnedSections.pop().nextElementSibling);  
 
 
-// function horizontalScroll() {
+    pinnedSections.forEach((section, index, sections) => {
 
-//     let sections = gsap.utils.toArray(".card");
+        let img = section.querySelector(".card_inner");
 
-//     gsap.to(sections, {
-//         xPercent: -100 * (sections.length - 1),
-//         ease: "none",
-//         scrollTrigger: {
-//             trigger: ".slider_section .slider",
-//             pin: true,
-//             scrub: 1,
-//             // snap: 1 / (sections.length - 1),
-//             end: () => "+=" + document.querySelector(".slider_section .slider").scrollWidth,
-//         }
-//     });
-// }
+        console.log("img",img);
+        
+        let nextSection = sections[index + 1] || lastCard;
+        console.log("nextSection",nextSection);
+        let endSectionPoint = `top+=${nextSection.offsetTop - section.offsetTop} top`;
+        gsap.to(section, {
+            scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: index === sections.length ? `+=S{lastCard.offsetHeight / 2}` : footer.offsetTop - window.innerHeight,
+                pin: true,
+                pinSpacing: false,
+                scrub: 1,
+                markers: true,
+            }
+        });
 
-// let countS = 0;
-// jQuery(".slider_section .slider > *").each(function () {
-//     countS += jQuery(this).outerWidth();
-//     console.log(jQuery(this).outerWidth());
-// })
-// console.log(countS);
-let countS = 0;
-jQuery(".slider_section .slider > *").each(function () {
-    countS += jQuery(this).outerWidth();
-    console.log(jQuery(this).outerWidth());
-})
-console.log(countS);
-
-function checkWidth() {
-    var windowSize = $(window).width();
-
-    if (windowSize > 768) {
-        const process = document.querySelector('.slider_section .slider')
-        if ((typeof (process) != 'undefined' && process != null)) {
-            let sections = gsap.utils.toArray('.slider_section .slider > *');
-            gsap.to(process, 3, {
-                x: () => (process.scrollWidth - window.outerWidth + 100) * -1,
-                // xPercent: -100,
-                // ease: "",
-                ease: "power1.ease",
-                duration: 0.5,
+        gsap.fromTo(img,
+            {
+                scale: 1
+            },
+            {
+                scale: 0.5,
+                ease: "none",
                 scrollTrigger: {
-                    markers: false,
-                    trigger: process,
-                    pin: '.slider_section',
-                    start: "top 8%",
-                    // end: '2000px',
-                    end: sections,
-                    // end: "bottom top",
-                    scrub: true,
-                    invalidateOnRefresh: true,
-                },
-            });
-        }
-        console.log("window.innerWidth", window.innerWidth);
-        console.log("process.scrollWidth", process.scrollWidth);
-        console.log("window.outerWidth - process.scrollWidth", window.outerWidth - process.scrollWidth);
-    }
+                    trigger: section,
+                    start: "top top",
+                    end: endSectionPoint,
+                    scrub: 1,
+                    markers: true,
+                }
+            }
+        )
+    });
 }
